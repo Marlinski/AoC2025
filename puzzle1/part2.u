@@ -1,0 +1,30 @@
+click pos steps =
+  step currentPos remaining zeros =
+    if remaining Int.== +0 then
+      (currentPos, zeros)
+    else
+      direction = if steps Int.> +0 then +1 else -1
+      nextPos = Int.mod (currentPos Int.+ direction) +100
+      newZeros = if nextPos Int.== +0 then zeros Nat.+ 1 else zeros
+      step nextPos (remaining Int.- +1) newZeros
+
+  absSteps = if steps Int.< +0 then Int.negate steps else steps
+  step pos absSteps 0
+
+solve2 input =
+  lines = Text.split ?\n input |> List.filter (l -> Text.size l Nat.> 0)
+  result = List.foldLeft (acc line ->
+    match acc with
+      (pos, cnt) ->
+        dir = Text.take 1 line
+        dist = Nat.fromText (Text.drop 1 line) |> Optional.getOrElse 0
+        steps = if dir Text.== "R" then Nat.toInt dist else Int.negate (Nat.toInt dist)
+        (newPos, zeros) = click pos steps
+        (newPos, cnt Nat.+ zeros)) (+50, 0) lines
+  match result with (_, count) -> count
+
+test2 _ =
+  solve2 (readFile (FilePath "example") |> Text.fromUtf8)
+
+solution2 _ =
+  solve2 (readFile (FilePath "input") |> Text.fromUtf8)

@@ -1,0 +1,20 @@
+rotate pos line =
+  dir = Text.take 1 line
+  dist = Nat.fromText (Text.drop 1 line) |> Optional.getOrElse 0
+  if dir Text.== "R" then Nat.mod (pos Nat.+ dist) 100
+  else Nat.mod (pos Nat.+ (100 Nat.* (dist / 100 Nat.+ 1)) Nat.- dist) 100
+
+solve input =
+  lines = Text.split ?\n input |> List.filter (l -> Text.size l Nat.> 0)
+  result = List.foldLeft (acc line ->
+    match acc with
+      (pos, cnt) ->
+        newPos = rotate pos line
+        (newPos, if newPos Nat.== 0 then cnt Nat.+ 1 else cnt)) (50, 0) lines
+  match result with (_, count) -> count
+
+test1 _ =
+  solve (readFile (FilePath "example") |> Text.fromUtf8)
+
+solution1 _ =
+  solve (readFile (FilePath "input") |> Text.fromUtf8)
